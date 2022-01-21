@@ -1,7 +1,5 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:code_generator/code_generator.dart';
-import 'package:dart_style/dart_style.dart';
-import 'package:path/path.dart';
 
 import 'class_targeted_generator.dart';
 import '../extensions.dart';
@@ -17,13 +15,11 @@ class RepositoryGenerator extends ClassTargetedGenerator {
     final snakeCaseMemberName = classObj.name.toSnakeCase();
 
     return GeneratorResult.single(
-      path: join(
-        dirname(path),
+      path: relativePath(
+        path,
         '../repository/${snakeCaseMemberName}_repository.dart',
       ),
-      content: DartFormatter().format(
-        _buildString(classObj, snakeCaseMemberName),
-      ),
+      content: format(_buildString(classObj, snakeCaseMemberName)),
     );
   }
 
