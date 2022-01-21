@@ -23,6 +23,7 @@ void main() {
     expect(
       generatedFile.content,
       '''import 'package:equatable/equatable.dart';
+
 import '../../models/user.dart';
 
 class EditingUserDto extends Equatable {

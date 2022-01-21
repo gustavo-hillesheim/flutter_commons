@@ -1,9 +1,9 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:code_generator/code_generator.dart';
+import 'package:dart_style/dart_style.dart';
+import 'package:path/path.dart';
 
 import 'class_targeted_generator.dart';
-import '../builders/class_builder.dart';
-import '../builders/library_bulder.dart';
 import '../extensions.dart';
 import '../mappers/class_declaration_mapper.dart';
 import '../models/class.dart';
@@ -15,32 +15,29 @@ class RepositoryGenerator extends ClassTargetedGenerator {
   GeneratorResult generate(ClassDeclaration member, String path) {
     final classObj = ClassDeclarationMapper().toClass(member);
     final snakeCaseMemberName = classObj.name.toSnakeCase();
-    final libraryBuilder = LibraryBuilder(
-      '../repository/${snakeCaseMemberName}_repository.dart',
-      relativeTo: path,
-    );
-
-    libraryBuilder
-        .import('package:flutter_commons_core/flutter_commons_core.dart');
-    libraryBuilder.import(path);
-    libraryBuilder.declare(_buildClass(classObj));
 
     return GeneratorResult.single(
-      path: libraryBuilder.path,
-      content: libraryBuilder.buildString(),
+      path: join(
+        dirname(path),
+        '../repository/${snakeCaseMemberName}_repository.dart',
+      ),
+      content: DartFormatter().format(
+        _buildString(classObj, snakeCaseMemberName),
+      ),
     );
   }
 
-  String _buildClass(Class classObj) {
+  String _buildString(Class classObj, String snakeCaseMemberName) {
     final idField = classObj.instanceFields.firstWhere(
         (f) => f.hasMetadata('Id') && f.type != null,
         orElse: () => throw Exception(
             'Could not find field annotated with @Id() in ${classObj.name}'));
-    final classBuilder = ClassBuilder(
-      '${classObj.name}Repository',
-      extend: 'Repository<${classObj.name}, ${idField.type}>',
-      abstract: true,
-    );
-    return classBuilder.buildString();
+    return '''
+import 'package:flutter_commons_core/flutter_commons_core.dart';
+
+import '../models/$snakeCaseMemberName.dart';
+
+abstract class ${classObj.name}Repository extends Repository<${classObj.name}, ${idField.type}> {}
+    ''';
   }
 }

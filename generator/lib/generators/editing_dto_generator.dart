@@ -1,9 +1,9 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:code_generator/code_generator.dart';
+import 'package:dart_style/dart_style.dart';
+import 'package:path/path.dart';
 
 import 'class_targeted_generator.dart';
-import '../builders/class_builder.dart';
-import '../builders/library_bulder.dart';
 import '../extensions.dart';
 import '../mappers/class_declaration_mapper.dart';
 import '../models/class.dart';
@@ -15,48 +15,42 @@ class EditingDtoGenerator extends ClassTargetedGenerator {
   GeneratorResult generate(ClassDeclaration member, String path) {
     final classObj = ClassDeclarationMapper().toClass(member);
     final snakeCaseMemberName = classObj.name.toSnakeCase();
-    final libraryBuilder = LibraryBuilder(
-      '../dto/$snakeCaseMemberName/editing_${snakeCaseMemberName}_dto.dart',
-      relativeTo: path,
-    );
-
-    libraryBuilder.import('package:equatable/equatable.dart');
-    libraryBuilder.import(path);
-    libraryBuilder.declare(_buildClass(classObj));
 
     return GeneratorResult.single(
-      path: libraryBuilder.path,
-      content: libraryBuilder.buildString(),
+      path: join(
+        dirname(path),
+        '../dto/$snakeCaseMemberName/editing_${snakeCaseMemberName}_dto.dart',
+      ),
+      content: DartFormatter().format(
+        _buildString(classObj, snakeCaseMemberName),
+      ),
     );
   }
 
-  String _buildClass(Class classObj) {
-    final classBuilder = ClassBuilder(
-      'Editing${classObj.name}Dto',
-      extend: 'Equatable',
-    );
-    classBuilder.addFields(classObj.instanceFields);
-    classBuilder.addDefaultConstructor();
+  String _buildString(Class classObj, String snakeCaseMemberName) => '''
+import 'package:equatable/equatable.dart';
 
-    var getPropsBody = 'return [';
-    var toMemberBody = 'return ${classObj.name}(';
-    for (final field in classObj.instanceFields) {
-      toMemberBody += '${field.name}: ${field.name},';
-      getPropsBody += '${field.name},';
-    }
-    toMemberBody += ');';
-    getPropsBody += '];';
-    classBuilder.addMethod(
-      'to${classObj.name}',
-      returnType: classObj.name,
-      body: toMemberBody,
+import '../../models/$snakeCaseMemberName.dart';
+
+class Editing${classObj.name}Dto extends Equatable {
+  ${classObj.instanceFields.map((f) => 'final ${f.nullableType} ${f.name};').join('\n')}
+
+  Editing${classObj.name}Dto({
+  ${classObj.instanceFields.map((f) => '${!f.isNullable ? 'required' : ''} this.${f.name},').join('\n')}
+  });
+
+  ${classObj.name} to${classObj.name}() {
+    return ${classObj.name}(
+      ${classObj.instanceFields.map((f) => '${f.name}: ${f.name},').join('\n')}
     );
-    classBuilder.addGetter(
-      'props',
-      returnType: 'List<Object?>',
-      body: getPropsBody,
-      metadata: ['@override'],
-    );
-    return classBuilder.buildString();
   }
+
+  @override
+  List<Object?> get props {
+    return [
+      ${classObj.instanceFields.map((f) => '${f.name},').join('\n')}
+    ];
+  }
+}
+      ''';
 }

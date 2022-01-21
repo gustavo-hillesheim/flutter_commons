@@ -24,10 +24,11 @@ void main() {
       generatedFile.content,
       '''import 'package:flutter_commons_core/flutter_commons_core.dart';
 import 'package:fpdart/fpdart.dart';
+
 import '../../models/user.dart';
 import '../../repository/user_repository.dart';
 
-abstract class GetUserUseCase extends UseCase<int, User?> {
+class GetUserUseCase extends UseCase<int, User?> {
   final UserRepository repository;
 
   GetUserUseCase({

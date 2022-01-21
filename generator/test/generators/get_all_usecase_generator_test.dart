@@ -17,17 +17,21 @@ void main() {
     expect(generatorResult.files.length, 1);
     final generatedFile = generatorResult.files[0];
     expect(
-        normalize(generatedFile.path),
-        normalize(join(exampleDirDirectory.path,
-            'lib/usecase/user/get_users_usecase.dart')));
+      normalize(generatedFile.path),
+      normalize(join(
+        exampleDirDirectory.path,
+        'lib/usecase/user/get_users_usecase.dart',
+      )),
+    );
     expect(
       generatedFile.content,
       '''import 'package:flutter_commons_core/flutter_commons_core.dart';
 import 'package:fpdart/fpdart.dart';
+
 import '../../models/user.dart';
 import '../../repository/user_repository.dart';
 
-abstract class GetUsersUseCase extends UseCase<NoParams, List<User>> {
+class GetUsersUseCase extends UseCase<NoParams, List<User>> {
   final UserRepository repository;
 
   GetUsersUseCase({

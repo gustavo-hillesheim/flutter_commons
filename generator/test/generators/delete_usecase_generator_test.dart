@@ -24,10 +24,11 @@ void main() {
       generatedFile.content,
       '''import 'package:flutter_commons_core/flutter_commons_core.dart';
 import 'package:fpdart/fpdart.dart';
+
 import '../../models/user.dart';
 import '../../repository/user_repository.dart';
 
-abstract class DeleteUserUseCase extends UseCase<User, void> {
+class DeleteUserUseCase extends UseCase<User, void> {
   final UserRepository repository;
 
   DeleteUserUseCase({

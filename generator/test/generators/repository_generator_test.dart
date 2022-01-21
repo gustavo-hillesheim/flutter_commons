@@ -23,6 +23,7 @@ void main() {
     expect(
       generatedFile.content,
       '''import 'package:flutter_commons_core/flutter_commons_core.dart';
+
 import '../models/user.dart';
 
 abstract class UserRepository extends Repository<User, int> {}
