@@ -17,7 +17,6 @@ class Field {
     this.nullableType,
   });
 
-  bool get isFinal => keyword == 'final';
   bool get isNullable => nullableType?.endsWith('?') ?? false;
 
   bool hasMetadata(String metadataName) =>

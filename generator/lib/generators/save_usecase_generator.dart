@@ -24,10 +24,7 @@ class SaveUseCaseGenerator extends ClassTargetedGenerator {
   }
 
   String _buildString(Class classObj, String snakeCaseMemberName) {
-    final idField = classObj.instanceFields.firstWhere(
-        (f) => f.hasMetadata('Id') && f.type != null,
-        orElse: () => throw Exception(
-            'Could not find field annotated with @Id() in ${classObj.name}'));
+    final idField = findIdField(classObj);
     return '''
 import 'package:flutter_commons_core/flutter_commons_core.dart';
 import 'package:fpdart/fpdart.dart';
