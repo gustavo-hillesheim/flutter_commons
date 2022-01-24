@@ -18,13 +18,35 @@ class ListingDtoGenerator extends ClassTargetedGenerator {
       '../dto/$snakeCaseMemberName/listing_${snakeCaseMemberName}_dto.dart',
       from: path,
     );
-    return GeneratorResult.single(
-      path: outputPath,
-      content: format(_buildString(classObj, outputPath, path)),
+    final packageRoot = getPackageRoot(path);
+    return GeneratorResult(
+      [
+        GeneratedFile(
+          path: outputPath,
+          content: format(_buildDtoLibrary(
+            classObj,
+            outputPath: outputPath,
+            sourcePath: path,
+          )),
+        ),
+        GeneratedFile(
+          path: testPath(outputPath, packageRoot: packageRoot),
+          content: format(_buildTestLibrary(
+            classObj,
+            outputPath: outputPath,
+            sourcePath: path,
+            packageRoot: packageRoot,
+          )),
+        ),
+      ],
     );
   }
 
-  String _buildString(Class classObj, String outputPath, String sourcePath) {
+  String _buildDtoLibrary(
+    Class classObj, {
+    required String outputPath,
+    required String sourcePath,
+  }) {
     final uncapitalizedClassName = classObj.name.uncapitalized;
     final relativeClassImport = relativeImport(sourcePath, from: outputPath);
     return '''
@@ -50,5 +72,30 @@ class Listing${classObj.name}Dto extends Equatable {
   }
 }
     ''';
+  }
+
+  String _buildTestLibrary(
+    Class classObj, {
+    required String outputPath,
+    required String sourcePath,
+    required String packageRoot,
+  }) {
+    final classVariableName = classObj.name.uncapitalized;
+    return '''
+import 'package:test/test.dart';
+import '${packageImport(outputPath, packageRoot: packageRoot)}';
+import '${packageImport(sourcePath, packageRoot: packageRoot)}';
+
+void main() {
+  // TODO: set the object for comparison
+  final ${classObj.name} $classVariableName;
+
+  test('SHOULD convert ${classObj.name} to DTO', () {
+    final dto = Listing${classObj.name}Dto.from${classObj.name}($classVariableName);
+
+    ${classObj.instanceFields.map((f) => 'expect(dto.${f.name}, $classVariableName.${f.name});').join('\n')}
+  });
+}
+''';
   }
 }

@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:code_generator/code_generator.dart';
+import 'package:path/path.dart';
 
 import 'class_targeted_generator.dart';
 import '../extensions.dart';
@@ -18,13 +19,35 @@ class EditingDtoGenerator extends ClassTargetedGenerator {
       '../dto/$snakeCaseMemberName/editing_${snakeCaseMemberName}_dto.dart',
       from: path,
     );
-    return GeneratorResult.single(
-      path: outputPath,
-      content: format(_buildString(classObj, outputPath, path)),
+    final packageRoot = getPackageRoot(path);
+    return GeneratorResult(
+      [
+        GeneratedFile(
+          path: outputPath,
+          content: format(_buildDtoLibrary(
+            classObj,
+            outputPath: outputPath,
+            sourcePath: path,
+          )),
+        ),
+        GeneratedFile(
+          path: testPath(outputPath, packageRoot: packageRoot),
+          content: format(_buildTestLibrary(
+            classObj,
+            outputPath: outputPath,
+            sourcePath: path,
+            packageRoot: packageRoot,
+          )),
+        ),
+      ],
     );
   }
 
-  String _buildString(Class classObj, String outputPath, String sourcePath) {
+  String _buildDtoLibrary(
+    Class classObj, {
+    required String outputPath,
+    required String sourcePath,
+  }) {
     final relativeClassImport = relativeImport(sourcePath, from: outputPath);
     return '''
 import 'package:equatable/equatable.dart';
@@ -52,5 +75,32 @@ class Editing${classObj.name}Dto extends Equatable {
   }
 }
       ''';
+  }
+
+  String _buildTestLibrary(
+    Class classObj, {
+    required String outputPath,
+    required String sourcePath,
+    required String packageRoot,
+  }) {
+    final classVariableName = classObj.name.uncapitalized;
+    return '''
+import 'package:test/test.dart';
+import '${packageImport(outputPath, packageRoot: packageRoot)}';
+import '${packageImport(sourcePath, packageRoot: packageRoot)}';
+
+void main() {
+  // TODO: set the object for comparison
+  final ${classObj.name} $classVariableName;
+
+  test('SHOULD convert DTO to ${classObj.name}', () {
+    final dto = Editing${classObj.name}Dto(
+      ${classObj.instanceFields.map((f) => '${f.name}: $classVariableName.${f.name},').join('\n')}
+    );
+
+    expect(dto.to${classObj.name}(), $classVariableName);
+  });
+}
+''';
   }
 }

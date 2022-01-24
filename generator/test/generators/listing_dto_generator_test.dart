@@ -14,7 +14,7 @@ void main() {
   test('SHOULD generate ListingDto for User class', () async {
     final generatorResult = await runGenerator(generator);
 
-    expect(generatorResult.files.length, 1);
+    expect(generatorResult.files.length, 2);
     final generatedFile = generatorResult.files[0];
     expect(
         normalize(generatedFile.path),
@@ -53,5 +53,29 @@ class ListingUserDto extends Equatable {
 }
 ''',
     );
+
+    final generatedTestFile = generatorResult.files[1];
+    expect(
+        normalize(generatedTestFile.path),
+        normalize(join(exampleDirDirectory.path,
+            'test/dto/user/listing_user_dto_test.dart')));
+    expect(generatedTestFile.content, '''
+import 'package:test/test.dart';
+import 'package:example/dto/user/listing_user_dto.dart';
+import 'package:example/models/user.dart';
+
+void main() {
+  // TODO: set the object for comparison
+  final User user;
+
+  test('SHOULD convert User to DTO', () {
+    final dto = ListingUserDto.fromUser(user);
+
+    expect(dto.id, user.id);
+    expect(dto.username, user.username);
+    expect(dto.password, user.password);
+  });
+}
+''');
   });
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:code_generator/code_generator.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:dart_style/dart_style.dart';
@@ -28,9 +30,46 @@ abstract class ClassTargetedGenerator extends GeneratorForClass {
     return join(dirname(from), path);
   }
 
-  String relativeImport(String source, {required String from}) {
-    return relative(source, from: dirname(from)).replaceAll('\\', '/');
+  String testPath(String library, {required String packageRoot}) {
+    final relativeLibraryPath =
+        relativeToLibPath(library, packageRoot: packageRoot);
+    return join(
+      packageRoot,
+      'test',
+      relativeLibraryPath.replaceAll('.dart', '') + '_test.dart',
+    );
+  }
+
+  String relativeToLibPath(String library, {required String packageRoot}) {
+    final libFolderPath = join(packageRoot, 'lib');
+    return normalize(library)
+        .replaceFirst('$libFolderPath$separator', '')
+        .replaceAll('\\', '/');
+  }
+
+  String relativeImport(String library, {required String from}) {
+    return relative(library, from: dirname(from)).replaceAll('\\', '/');
+  }
+
+  String packageImport(String library, {required String packageRoot}) {
+    final packageName = packageRoot.split(separator).last;
+    final libraryPath = relativeToLibPath(library, packageRoot: packageRoot);
+    return 'package:$packageName/$libraryPath';
   }
 
   String format(String code) => formatter.format(code);
+
+  String getPackageRoot(String path) {
+    FileSystemEntity entity = File(path);
+    while (entity.parent != entity) {
+      final parent = entity.parent;
+      for (final file in parent.listSync()) {
+        if (file is File && file.path.endsWith('pubspec.yaml')) {
+          return parent.absolute.path;
+        }
+      }
+      entity = parent;
+    }
+    throw Exception('Could not find package root');
+  }
 }
