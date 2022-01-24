@@ -92,7 +92,7 @@ import '${packageImport(sourcePath, packageRoot: packageRoot)}';
 void main() {
   late ${classObj.name}Repository repository;
   late Get${classObj.name}UseCase usecase;
-  // TODO: create User object or use a shared one
+  // TODO: create ${classObj.name} object or use a shared one
   final ${classObj.name} $classVariableName;
 
   setUp(() {
