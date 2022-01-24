@@ -61,7 +61,7 @@ void main() {
   late UserRepository repository;
   late SaveUserUseCase usecase;
   // TODO: create User object or use a shared one
-  final User user;
+  final User resultingUser;
   // TODO: create EditingUserDto object or use a shared one
   final EditingUserDto dto;
 
@@ -71,7 +71,8 @@ void main() {
   });
 
   test('WHEN executed SHOULD call repository', () async {
-    when(() => repository.save(user)).thenAnswer((_) async => Right(user.id!));
+    when(() => repository.save(resultingUser))
+        .thenAnswer((_) async => Right(resultingUser.id!));
 
     final result = await usecase.execute(dto);
 
@@ -79,7 +80,7 @@ void main() {
   });
 
   test('WHEN repository returns Failure SHOULD return Failure', () async {
-    when(() => repository.save(user))
+    when(() => repository.save(resultingUser))
         .thenAnswer((_) async => const Left(FakeFailure('failure')));
 
     final result = await usecase.execute(dto);

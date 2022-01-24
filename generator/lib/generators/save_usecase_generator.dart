@@ -94,7 +94,7 @@ void main() {
   late ${classObj.name}Repository repository;
   late Save${classObj.name}UseCase usecase;
   // TODO: create ${classObj.name} object or use a shared one
-  final ${classObj.name} $classVariableName;
+  final ${classObj.name} resulting${classObj.name};
   // TODO: create Editing${classObj.name}Dto object or use a shared one
   final Editing${classObj.name}Dto dto;
 
@@ -104,8 +104,8 @@ void main() {
   });
 
   test('WHEN executed SHOULD call repository', () async {
-    when(() => repository.save($classVariableName))
-        .thenAnswer((_) async => Right($classVariableName.${idField.name}!));
+    when(() => repository.save(resulting${classObj.name}))
+        .thenAnswer((_) async => Right(resulting${classObj.name}.${idField.name}!));
 
     final result = await usecase.execute(dto);
 
@@ -113,7 +113,7 @@ void main() {
   });
 
   test('WHEN repository returns Failure SHOULD return Failure', () async {
-    when(() => repository.save($classVariableName))
+    when(() => repository.save(resulting${classObj.name}))
         .thenAnswer((_) async => const Left(FakeFailure('failure')));
 
     final result = await usecase.execute(dto);
