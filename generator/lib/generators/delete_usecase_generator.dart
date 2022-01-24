@@ -18,13 +18,35 @@ class DeleteUseCaseGenerator extends ClassTargetedGenerator {
       '../usecase/$snakeCaseMemberName/delete_${snakeCaseMemberName}_usecase.dart',
       from: path,
     );
-    return GeneratorResult.single(
-      path: outputPath,
-      content: format(_buildString(classObj, outputPath, path)),
+    final packageRoot = getPackageRoot(path);
+    return GeneratorResult(
+      [
+        GeneratedFile(
+          path: outputPath,
+          content: format(_buildUseCaseLibrary(
+            classObj,
+            outputPath: outputPath,
+            sourcePath: path,
+          )),
+        ),
+        GeneratedFile(
+          path: testPath(outputPath, packageRoot: packageRoot),
+          content: format(_buildTestLibrary(
+            classObj,
+            outputPath: outputPath,
+            sourcePath: path,
+            packageRoot: packageRoot,
+          )),
+        ),
+      ],
     );
   }
 
-  String _buildString(Class classObj, String outputPath, String sourcePath) {
+  String _buildUseCaseLibrary(
+    Class classObj, {
+    required String outputPath,
+    required String sourcePath,
+  }) {
     final idField = findIdField(classObj);
     final snakeCaseClassName = classObj.name.toSnakeCase();
     final relativeClassImport = relativeImport(sourcePath, from: outputPath);
@@ -51,5 +73,62 @@ class Delete${classObj.name}UseCase extends UseCase<${classObj.name}, void> {
   }
 }
     ''';
+  }
+
+  String _buildTestLibrary(
+    Class classObj, {
+    required String outputPath,
+    required String sourcePath,
+    required String packageRoot,
+  }) {
+    final idField = findIdField(classObj);
+    final snakeCaseClassName = classObj.name.toSnakeCase();
+    final classVariableName = classObj.name.uncapitalized;
+    return '''
+import 'package:test/test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:fpdart/fpdart.dart';
+import 'package:flutter_commons_core/flutter_commons_core.dart';
+import '${packageImport('../repository/${snakeCaseClassName}_repository.dart', packageRoot: packageRoot, relativeTo: sourcePath)}';
+import '${packageImport(outputPath, packageRoot: packageRoot)}';
+import '${packageImport(sourcePath, packageRoot: packageRoot)}';
+
+void main() {
+  late ${classObj.name}Repository repository;
+  late Delete${classObj.name}UseCase usecase;
+  // TODO: create User object or use a shared one
+  final ${classObj.name} $classVariableName;
+
+  setUp(() {
+    repository = ${classObj.name}RepositoryMock();
+    usecase = Delete${classObj.name}UseCase(repository: repository);
+  });
+
+  test('WHEN executed SHOULD call repository', () async {
+    when(() => repository.deleteById($classVariableName.${idField.name}!))
+        .thenAnswer((_) async => const Right(null));
+
+    final result = await usecase.execute($classVariableName);
+
+    expect(result.isRight(), true);
+  });
+
+  test('WHEN repository returns Failure SHOULD return Failure', () async {
+    when(() => repository.deleteById($classVariableName.${idField.name}!))
+        .thenAnswer((_) async => const Left(FakeFailure('failure')));
+
+    final result = await usecase.execute($classVariableName);
+
+    expect(result.isLeft(), true);
+    expect(result.getLeft().toNullable()?.message, 'failure');
+  });
+}
+
+// If you want to, you could add these classes to a shared file and remove them from each generated file
+class ${classObj.name}RepositoryMock extends Mock implements ${classObj.name}Repository {}
+class FakeFailure extends Failure {
+  const FakeFailure(String message) : super(message);
+}
+''';
   }
 }

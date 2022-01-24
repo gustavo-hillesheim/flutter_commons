@@ -59,7 +59,7 @@ import 'package:example/models/user.dart';
 void main() {
   late UserRepository repository;
   late GetUserUseCase usecase;
-  // TODO: set the object for comparison
+  // TODO: create User object or use a shared one
   final User user;
 
   setUp(() {
@@ -88,6 +88,7 @@ void main() {
   });
 }
 
+// If you want to, you could add these classes to a shared file and remove them from each generated file
 class UserRepositoryMock extends Mock implements UserRepository {}
 
 class FakeFailure extends Failure {

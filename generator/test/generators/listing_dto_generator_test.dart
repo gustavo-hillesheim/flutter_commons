@@ -65,7 +65,7 @@ import 'package:example/dto/user/listing_user_dto.dart';
 import 'package:example/models/user.dart';
 
 void main() {
-  // TODO: set the object for comparison
+  // TODO: create User object or use a shared one
   final User user;
 
   test('SHOULD convert User to DTO', () {

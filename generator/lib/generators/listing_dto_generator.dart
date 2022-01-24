@@ -87,7 +87,7 @@ import '${packageImport(outputPath, packageRoot: packageRoot)}';
 import '${packageImport(sourcePath, packageRoot: packageRoot)}';
 
 void main() {
-  // TODO: set the object for comparison
+  // TODO: create User object or use a shared one
   final ${classObj.name} $classVariableName;
 
   test('SHOULD convert ${classObj.name} to DTO', () {

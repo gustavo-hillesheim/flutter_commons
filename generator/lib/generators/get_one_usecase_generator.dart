@@ -92,7 +92,7 @@ import '${packageImport(sourcePath, packageRoot: packageRoot)}';
 void main() {
   late ${classObj.name}Repository repository;
   late Get${classObj.name}UseCase usecase;
-  // TODO: set the object for comparison
+  // TODO: create User object or use a shared one
   final ${classObj.name} $classVariableName;
 
   setUp(() {
@@ -121,6 +121,7 @@ void main() {
   });
 }
 
+// If you want to, you could add these classes to a shared file and remove them from each generated file
 class ${classObj.name}RepositoryMock extends Mock implements ${classObj.name}Repository {}
 class FakeFailure extends Failure {
   const FakeFailure(String message) : super(message);
