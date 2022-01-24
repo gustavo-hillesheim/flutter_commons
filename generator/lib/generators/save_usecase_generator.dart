@@ -28,13 +28,11 @@ class SaveUseCaseGenerator extends ClassTargetedGenerator {
   String _buildString(Class classObj, String outputPath, String sourcePath) {
     final idField = findIdField(classObj);
     final snakeCaseClassName = classObj.name.toSnakeCase();
-    final relativeClassPath = relativeImport(sourcePath, from: outputPath);
     return '''
 import 'package:flutter_commons_core/flutter_commons_core.dart';
 import 'package:fpdart/fpdart.dart';
 
-import '$relativeClassPath';
-import '../../dto/editing_${snakeCaseClassName}_dto.dart';
+import '../../dto/$snakeCaseClassName/editing_${snakeCaseClassName}_dto.dart';
 import '../../repository/${snakeCaseClassName}_repository.dart';
 
 class Save${classObj.name}UseCase extends UseCase<Editing${classObj.name}Dto, ${idField.type}> {

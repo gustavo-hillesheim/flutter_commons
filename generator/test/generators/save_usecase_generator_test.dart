@@ -25,8 +25,7 @@ void main() {
       '''import 'package:flutter_commons_core/flutter_commons_core.dart';
 import 'package:fpdart/fpdart.dart';
 
-import '../../models/user.dart';
-import '../../dto/editing_user_dto.dart';
+import '../../dto/user/editing_user_dto.dart';
 import '../../repository/user_repository.dart';
 
 class SaveUserUseCase extends UseCase<EditingUserDto, int> {

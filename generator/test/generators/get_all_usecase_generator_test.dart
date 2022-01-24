@@ -28,8 +28,7 @@ void main() {
       '''import 'package:flutter_commons_core/flutter_commons_core.dart';
 import 'package:fpdart/fpdart.dart';
 
-import '../../models/user.dart';
-import '../../dto/listing_user_dto.dart';
+import '../../dto/user/listing_user_dto.dart';
 import '../../repository/user_repository.dart';
 
 class GetUsersUseCase extends UseCase<NoParams, List<ListingUserDto>> {
@@ -42,8 +41,10 @@ class GetUsersUseCase extends UseCase<NoParams, List<ListingUserDto>> {
   @override
   Future<Either<Failure, List<ListingUserDto>>> execute(NoParams input) {
     return repository.findAll().then(
-          (entities) =>
-              entities.map((e) => ListingUserDto.fromUser(e)).toList(),
+          (r) => r.map(
+            (entities) =>
+                entities.map((e) => ListingUserDto.fromUser(e)).toList(),
+          ),
         );
   }
 }

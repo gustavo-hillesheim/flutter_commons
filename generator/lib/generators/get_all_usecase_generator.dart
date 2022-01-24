@@ -26,13 +26,11 @@ class GetAllUseCaseGenerator extends ClassTargetedGenerator {
 
   String _buildString(Class classObj, String outputPath, String sourcePath) {
     final snakeCaseClassName = classObj.name.toSnakeCase();
-    final relativeClassImport = relativeImport(sourcePath, from: outputPath);
     return '''
 import 'package:flutter_commons_core/flutter_commons_core.dart';
 import 'package:fpdart/fpdart.dart';
 
-import '$relativeClassImport';
-import '../../dto/listing_${snakeCaseClassName}_dto.dart';
+import '../../dto/$snakeCaseClassName/listing_${snakeCaseClassName}_dto.dart';
 import '../../repository/${snakeCaseClassName}_repository.dart';
 
 class Get${classObj.name}sUseCase extends UseCase<NoParams, List<Listing${classObj.name}Dto>> {
@@ -44,7 +42,12 @@ class Get${classObj.name}sUseCase extends UseCase<NoParams, List<Listing${classO
 
   @override
   Future<Either<Failure, List<Listing${classObj.name}Dto>>> execute(NoParams input) {
-    return repository.findAll().then((entities) => entities.map((e) => Listing${classObj.name}Dto.from${classObj.name}(e)).toList(),);
+    return repository.findAll().then(
+          (r) => r.map(
+            (entities) =>
+                entities.map((e) => Listing${classObj.name}Dto.from${classObj.name}(e)).toList(),
+          ),
+        );
   }
 }
     ''';
