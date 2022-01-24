@@ -26,9 +26,10 @@ void main() {
 import 'package:fpdart/fpdart.dart';
 
 import '../../models/user.dart';
+import '../../dto/editing_user_dto.dart';
 import '../../repository/user_repository.dart';
 
-class SaveUserUseCase extends UseCase<User, int> {
+class SaveUserUseCase extends UseCase<EditingUserDto, int> {
   final UserRepository repository;
 
   SaveUserUseCase({
@@ -36,8 +37,8 @@ class SaveUserUseCase extends UseCase<User, int> {
   });
 
   @override
-  Future<Either<Failure, int>> execute(User input) {
-    return repository.save(input);
+  Future<Either<Failure, int>> execute(EditingUserDto input) {
+    return repository.save(input.toUser());
   }
 }
 ''',

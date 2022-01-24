@@ -29,9 +29,10 @@ import 'package:flutter_commons_core/flutter_commons_core.dart';
 import 'package:fpdart/fpdart.dart';
 
 import '../../models/$snakeCaseMemberName.dart';
+import '../../dto/listing_${snakeCaseMemberName}_dto.dart';
 import '../../repository/${snakeCaseMemberName}_repository.dart';
 
-class Get${classObj.name}sUseCase extends UseCase<NoParams, List<${classObj.name}>> {
+class Get${classObj.name}sUseCase extends UseCase<NoParams, List<Listing${classObj.name}Dto>> {
   final ${classObj.name}Repository repository;
 
   Get${classObj.name}sUseCase({
@@ -39,8 +40,8 @@ class Get${classObj.name}sUseCase extends UseCase<NoParams, List<${classObj.name
   });
 
   @override
-  Future<Either<Failure, List<${classObj.name}>>> execute(NoParams input) {
-    return repository.findAll();
+  Future<Either<Failure, List<Listing${classObj.name}Dto>>> execute(NoParams input) {
+    return repository.findAll().then((entities) => entities.map((e) => Listing${classObj.name}Dto.from${classObj.name}(e)).toList(),);
   }
 }
     ''';

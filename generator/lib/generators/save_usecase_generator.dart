@@ -30,9 +30,10 @@ import 'package:flutter_commons_core/flutter_commons_core.dart';
 import 'package:fpdart/fpdart.dart';
 
 import '../../models/$snakeCaseMemberName.dart';
+import '../../dto/editing_${snakeCaseMemberName}_dto.dart';
 import '../../repository/${snakeCaseMemberName}_repository.dart';
 
-class Save${classObj.name}UseCase extends UseCase<${classObj.name}, ${idField.type}> {
+class Save${classObj.name}UseCase extends UseCase<Editing${classObj.name}Dto, ${idField.type}> {
   final ${classObj.name}Repository repository;
 
   Save${classObj.name}UseCase({
@@ -40,8 +41,8 @@ class Save${classObj.name}UseCase extends UseCase<${classObj.name}, ${idField.ty
   });
 
   @override
-  Future<Either<Failure, ${idField.type}>> execute(${classObj.name} input) {
-    return repository.save(input);
+  Future<Either<Failure, ${idField.type}>> execute(Editing${classObj.name}Dto input) {
+    return repository.save(input.to${classObj.name}());
   }
 }
     ''';

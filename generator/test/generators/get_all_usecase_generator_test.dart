@@ -29,9 +29,10 @@ void main() {
 import 'package:fpdart/fpdart.dart';
 
 import '../../models/user.dart';
+import '../../dto/listing_user_dto.dart';
 import '../../repository/user_repository.dart';
 
-class GetUsersUseCase extends UseCase<NoParams, List<User>> {
+class GetUsersUseCase extends UseCase<NoParams, List<ListingUserDto>> {
   final UserRepository repository;
 
   GetUsersUseCase({
@@ -39,8 +40,11 @@ class GetUsersUseCase extends UseCase<NoParams, List<User>> {
   });
 
   @override
-  Future<Either<Failure, List<User>>> execute(NoParams input) {
-    return repository.findAll();
+  Future<Either<Failure, List<ListingUserDto>>> execute(NoParams input) {
+    return repository.findAll().then(
+          (entities) =>
+              entities.map((e) => ListingUserDto.fromUser(e)).toList(),
+        );
   }
 }
 ''',
