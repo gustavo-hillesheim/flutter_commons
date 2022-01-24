@@ -24,8 +24,12 @@ abstract class ClassTargetedGenerator extends GeneratorForClass {
             'Could not find field annotated with @Id() in ${classObj.name}'));
   }
 
-  String relativePath(String path1, String path2) {
-    return join(dirname(path1), path2);
+  String relativePath(String path, {required String from}) {
+    return join(dirname(from), path);
+  }
+
+  String relativeImport(String source, {required String from}) {
+    return relative(source, from: dirname(from)).replaceAll('\\', '/');
   }
 
   String format(String code) => formatter.format(code);

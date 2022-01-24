@@ -14,24 +14,26 @@ class DeleteUseCaseGenerator extends ClassTargetedGenerator {
     final classObj = ClassDeclarationMapper().toClass(member);
     final snakeCaseMemberName = classObj.name.toSnakeCase();
 
+    final outputPath = relativePath(
+      '../usecase/$snakeCaseMemberName/delete_${snakeCaseMemberName}_usecase.dart',
+      from: path,
+    );
     return GeneratorResult.single(
-      path: relativePath(
-        path,
-        '../usecase/$snakeCaseMemberName/delete_${snakeCaseMemberName}_usecase.dart',
-      ),
-      content: format(_buildString(classObj, snakeCaseMemberName)),
+      path: outputPath,
+      content: format(_buildString(classObj, outputPath, path)),
     );
   }
 
-  String _buildString(Class classObj, String snakeCaseMemberName) {
+  String _buildString(Class classObj, String outputPath, String sourcePath) {
     final idField = findIdField(classObj);
-
+    final snakeCaseClassName = classObj.name.toSnakeCase();
+    final relativeClassImport = relativeImport(sourcePath, from: outputPath);
     return '''
 import 'package:flutter_commons_core/flutter_commons_core.dart';
 import 'package:fpdart/fpdart.dart';
 
-import '../../models/$snakeCaseMemberName.dart';
-import '../../repository/${snakeCaseMemberName}_repository.dart';
+import '$relativeClassImport';
+import '../../repository/${snakeCaseClassName}_repository.dart';
 
 class Delete${classObj.name}UseCase extends UseCase<${classObj.name}, void> {
   final ${classObj.name}Repository repository;

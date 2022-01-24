@@ -14,21 +14,23 @@ class RepositoryGenerator extends ClassTargetedGenerator {
     final classObj = ClassDeclarationMapper().toClass(member);
     final snakeCaseMemberName = classObj.name.toSnakeCase();
 
+    final outputPath = relativePath(
+      '../repository/${snakeCaseMemberName}_repository.dart',
+      from: path,
+    );
     return GeneratorResult.single(
-      path: relativePath(
-        path,
-        '../repository/${snakeCaseMemberName}_repository.dart',
-      ),
-      content: format(_buildString(classObj, snakeCaseMemberName)),
+      path: outputPath,
+      content: format(_buildString(classObj, outputPath, path)),
     );
   }
 
-  String _buildString(Class classObj, String snakeCaseMemberName) {
+  String _buildString(Class classObj, String outputPath, String sourcePath) {
     final idField = findIdField(classObj);
+    final relativeClassImport = relativeImport(sourcePath, from: outputPath);
     return '''
 import 'package:flutter_commons_core/flutter_commons_core.dart';
 
-import '../models/$snakeCaseMemberName.dart';
+import '$relativeClassImport';
 
 abstract class ${classObj.name}Repository extends Repository<${classObj.name}, ${idField.type}> {}
     ''';

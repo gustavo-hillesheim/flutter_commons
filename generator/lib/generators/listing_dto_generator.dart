@@ -14,21 +14,23 @@ class ListingDtoGenerator extends ClassTargetedGenerator {
     final classObj = ClassDeclarationMapper().toClass(member);
     final snakeCaseMemberName = classObj.name.toSnakeCase();
 
+    final outputPath = relativePath(
+      '../dto/$snakeCaseMemberName/listing_${snakeCaseMemberName}_dto.dart',
+      from: path,
+    );
     return GeneratorResult.single(
-      path: relativePath(
-        path,
-        '../dto/$snakeCaseMemberName/listing_${snakeCaseMemberName}_dto.dart',
-      ),
-      content: format(_buildString(classObj, snakeCaseMemberName)),
+      path: outputPath,
+      content: format(_buildString(classObj, outputPath, path)),
     );
   }
 
-  String _buildString(Class classObj, String snakeCaseMemberName) {
+  String _buildString(Class classObj, String outputPath, String sourcePath) {
     final uncapitalizedClassName = classObj.name.uncapitalized;
+    final relativeClassImport = relativeImport(sourcePath, from: outputPath);
     return '''
 import 'package:equatable/equatable.dart';
 
-import '../../models/$snakeCaseMemberName.dart';
+import '$relativeClassImport';
 
 class Listing${classObj.name}Dto extends Equatable {
   ${classObj.instanceFields.map((f) => 'final ${f.nullableType} ${f.name};').join('\n')}

@@ -14,23 +14,26 @@ class GetAllUseCaseGenerator extends ClassTargetedGenerator {
     final classObj = ClassDeclarationMapper().toClass(member);
     final snakeCaseMemberName = classObj.name.toSnakeCase();
 
+    final outputPath = relativePath(
+      '../usecase/$snakeCaseMemberName/get_${snakeCaseMemberName}s_usecase.dart',
+      from: path,
+    );
     return GeneratorResult.single(
-      path: relativePath(
-        path,
-        '../usecase/$snakeCaseMemberName/get_${snakeCaseMemberName}s_usecase.dart',
-      ),
-      content: format(_buildString(classObj, snakeCaseMemberName)),
+      path: outputPath,
+      content: format(_buildString(classObj, outputPath, path)),
     );
   }
 
-  String _buildString(Class classObj, String snakeCaseMemberName) {
+  String _buildString(Class classObj, String outputPath, String sourcePath) {
+    final snakeCaseClassName = classObj.name.toSnakeCase();
+    final relativeClassImport = relativeImport(sourcePath, from: outputPath);
     return '''
 import 'package:flutter_commons_core/flutter_commons_core.dart';
 import 'package:fpdart/fpdart.dart';
 
-import '../../models/$snakeCaseMemberName.dart';
-import '../../dto/listing_${snakeCaseMemberName}_dto.dart';
-import '../../repository/${snakeCaseMemberName}_repository.dart';
+import '$relativeClassImport';
+import '../../dto/listing_${snakeCaseClassName}_dto.dart';
+import '../../repository/${snakeCaseClassName}_repository.dart';
 
 class Get${classObj.name}sUseCase extends UseCase<NoParams, List<Listing${classObj.name}Dto>> {
   final ${classObj.name}Repository repository;

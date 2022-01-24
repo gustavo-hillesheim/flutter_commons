@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:code_generator/code_generator.dart';
+import 'package:path/path.dart';
 
 import 'class_targeted_generator.dart';
 import '../models/class.dart';
@@ -14,24 +15,27 @@ class SaveUseCaseGenerator extends ClassTargetedGenerator {
     final classObj = ClassDeclarationMapper().toClass(member);
     final snakeCaseMemberName = classObj.name.toSnakeCase();
 
+    final outputPath = relativePath(
+      '../usecase/$snakeCaseMemberName/save_${snakeCaseMemberName}_usecase.dart',
+      from: path,
+    );
     return GeneratorResult.single(
-      path: relativePath(
-        path,
-        '../usecase/$snakeCaseMemberName/save_${snakeCaseMemberName}_usecase.dart',
-      ),
-      content: format(_buildString(classObj, snakeCaseMemberName)),
+      path: outputPath,
+      content: format(_buildString(classObj, outputPath, path)),
     );
   }
 
-  String _buildString(Class classObj, String snakeCaseMemberName) {
+  String _buildString(Class classObj, String outputPath, String sourcePath) {
     final idField = findIdField(classObj);
+    final snakeCaseClassName = classObj.name.toSnakeCase();
+    final relativeClassPath = relativeImport(sourcePath, from: outputPath);
     return '''
 import 'package:flutter_commons_core/flutter_commons_core.dart';
 import 'package:fpdart/fpdart.dart';
 
-import '../../models/$snakeCaseMemberName.dart';
-import '../../dto/editing_${snakeCaseMemberName}_dto.dart';
-import '../../repository/${snakeCaseMemberName}_repository.dart';
+import '$relativeClassPath';
+import '../../dto/editing_${snakeCaseClassName}_dto.dart';
+import '../../repository/${snakeCaseClassName}_repository.dart';
 
 class Save${classObj.name}UseCase extends UseCase<Editing${classObj.name}Dto, ${idField.type}> {
   final ${classObj.name}Repository repository;
