@@ -58,6 +58,8 @@ import '$relativeClassImport';
 import '../../repository/${snakeCaseClassName}_repository.dart';
 
 class Delete${classObj.name}UseCase extends UseCase<${classObj.name}, void> {
+  static const entityWithoutIdError = 'Can not delete entity with null id';
+
   final ${classObj.name}Repository repository;
 
   Delete${classObj.name}UseCase({
@@ -67,7 +69,7 @@ class Delete${classObj.name}UseCase extends UseCase<${classObj.name}, void> {
   @override
   Future<Either<Failure, void>> execute(${classObj.name} input) async {
     if (input.${idField.name} == null) {
-      return const Left(BusinessFailure('Can not delete entity with null id'));
+      return const Left(BusinessFailure(entityWithoutIdError));
     }
     return repository.deleteById(input.id!);
   }
@@ -98,6 +100,8 @@ void main() {
   late Delete${classObj.name}UseCase usecase;
   // TODO: create ${classObj.name} object or use a shared one
   final ${classObj.name} $classVariableName;
+  // TODO: create ${classObj.name} object or use a shared one
+  final ${classObj.name} ${classVariableName}WithoutId;
 
   setUp(() {
     repository = ${classObj.name}RepositoryMock();
@@ -121,6 +125,14 @@ void main() {
 
     expect(result.isLeft(), true);
     expect(result.getLeft().toNullable()?.message, 'failure');
+  });
+
+  test('WHEN $classVariableName has no id SHOULD return Failure', () async {
+    final result = await usecase.execute(${classVariableName}WithoutId);
+
+    expect(result.isLeft(), true);
+    expect(result.getLeft().toNullable()?.message, Delete${classObj.name}UseCase.entityWithoutIdError,);
+
   });
 }
 

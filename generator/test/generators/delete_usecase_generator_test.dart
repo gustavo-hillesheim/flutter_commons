@@ -29,6 +29,8 @@ import '../../models/user.dart';
 import '../../repository/user_repository.dart';
 
 class DeleteUserUseCase extends UseCase<User, void> {
+  static const entityWithoutIdError = 'Can not delete entity with null id';
+
   final UserRepository repository;
 
   DeleteUserUseCase({
@@ -38,7 +40,7 @@ class DeleteUserUseCase extends UseCase<User, void> {
   @override
   Future<Either<Failure, void>> execute(User input) async {
     if (input.id == null) {
-      return const Left(BusinessFailure('Can not delete entity with null id'));
+      return const Left(BusinessFailure(entityWithoutIdError));
     }
     return repository.deleteById(input.id!);
   }
@@ -64,6 +66,8 @@ void main() {
   late DeleteUserUseCase usecase;
   // TODO: create User object or use a shared one
   final User user;
+  // TODO: create User object or use a shared one
+  final User userWithoutId;
 
   setUp(() {
     repository = UserRepositoryMock();
@@ -87,6 +91,16 @@ void main() {
 
     expect(result.isLeft(), true);
     expect(result.getLeft().toNullable()?.message, 'failure');
+  });
+
+  test('WHEN user has no id SHOULD return Failure', () async {
+    final result = await usecase.execute(userWithoutId);
+
+    expect(result.isLeft(), true);
+    expect(
+      result.getLeft().toNullable()?.message,
+      DeleteUserUseCase.entityWithoutIdError,
+    );
   });
 }
 
