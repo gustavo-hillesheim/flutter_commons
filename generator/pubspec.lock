@@ -76,7 +76,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "172baa230bfc78d9303b729691d59ac128e65476"
+      resolved-ref: "4b9b050468913c24919c76b4d42020647ddf5c3f"
       url: "https://github.com/gustavo-hillesheim/dart_code_generator.git"
     source: git
     version: "1.0.0"
@@ -115,6 +115,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.1"
+  equatable:
+    dependency: transitive
+    description:
+      name: equatable
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.3"
   file:
     dependency: transitive
     description:

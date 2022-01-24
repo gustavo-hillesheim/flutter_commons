@@ -1,14 +1,35 @@
+import 'dart:io';
+
 import 'package:args/args.dart';
 import 'package:flutter_commons_generator/main.dart';
 
 void main(List<String> args) {
-  generate(buildArgs(getParser().parse(args)));
+  generate(buildArgs(getParser().parse(args)))
+      .listen((event) => print(event.message));
 }
 
 ArgParser getParser() {
-  return ArgParser()..addOption('target', abbr: 't', mandatory: true);
+  final generateParser = ArgParser()
+    ..addOption('target', abbr: 't', mandatory: true)
+    ..addFlag('overrideExistingFiles');
+
+  return ArgParser()..addCommand('generate', generateParser);
 }
 
 GenerationArgs buildArgs(ArgResults parsedArgs) {
-  return GenerationArgs(target: parsedArgs['target']);
+  if (parsedArgs.command?.name == 'generate') {
+    final generateArgs = parsedArgs.command!;
+    if (generateArgs.rest.isEmpty) {
+      print('Inform which structure should be generated');
+      exit(1);
+    }
+    return GenerationArgs(
+      target: generateArgs['target'],
+      structureToGenerate: generateArgs.rest[0],
+      overrideExisting: generateArgs['overrideExistingFiles'],
+    );
+  } else {
+    print('Unknown command ${parsedArgs.command?.name}');
+    exit(1);
+  }
 }
