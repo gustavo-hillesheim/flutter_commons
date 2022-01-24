@@ -51,8 +51,15 @@ abstract class ClassTargetedGenerator extends GeneratorForClass {
     return relative(library, from: dirname(from)).replaceAll('\\', '/');
   }
 
-  String packageImport(String library, {required String packageRoot}) {
+  String packageImport(
+    String library, {
+    required String packageRoot,
+    String? relativeTo,
+  }) {
     final packageName = packageRoot.split(separator).last;
+    if (relativeTo != null) {
+      library = relativePath(library, from: relativeTo);
+    }
     final libraryPath = relativeToLibPath(library, packageRoot: packageRoot);
     return 'package:$packageName/$libraryPath';
   }

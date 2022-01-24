@@ -1,6 +1,5 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:code_generator/code_generator.dart';
-import 'package:path/path.dart';
 
 import 'class_targeted_generator.dart';
 import '../extensions.dart';

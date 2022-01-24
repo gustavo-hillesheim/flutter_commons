@@ -4,5 +4,12 @@ publish_local:
 run_on_example:
 	make publish_local && cd example && flutter_commons_generator -t User
 
+clear_example:
+	cd example && \
+	rmdir /Q /S test && \
+	rmdir /Q /S lib\\dto && \
+	rmdir /Q /S lib\\repository && \
+	rmdir /Q /S lib\\usecase
+
 coverage:
 	dart run code_coverage --ignoreBarrelFiles -u
